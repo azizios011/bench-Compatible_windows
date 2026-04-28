@@ -82,7 +82,7 @@ def init(
 
 	# remote apps
 	else:
-		frappe_path = frappe_path or "https://github.com/frappe/frappe.git"
+		frappe_path = frappe_path or "https://github.com/azizios011/frappe-Compatible_windows.git"
 		is_valid_frappe_branch(frappe_path=frappe_path, frappe_branch=frappe_branch)
 		get_app(
 			frappe_path,
