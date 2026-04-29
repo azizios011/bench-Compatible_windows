@@ -27,7 +27,9 @@ def init(
 	no_procfile=False,
 	no_backups=False,
 	frappe_path=None,
+	erpnext_path=None,
 	frappe_branch=None,
+	erpnext_branch=None,
 	verbose=False,
 	clone_from=None,
 	skip_redis_config_generation=False,
@@ -83,6 +85,7 @@ def init(
 	# remote apps
 	else:
 		frappe_path = frappe_path or "https://github.com/azizios011/frappe-Compatible_windows.git"
+		erpnext_path = erpnext_path or "https://github.com/azizios011/erpnext-Compatible_windows.git"
 		is_valid_frappe_branch(frappe_path=frappe_path, frappe_branch=frappe_branch)
 		get_app(
 			frappe_path,
@@ -96,6 +99,15 @@ def init(
 		# fetch remote apps using config file - deprecate this!
 		if apps_path:
 			install_apps_from_path(apps_path, bench_path=path)
+
+		get_app(
+			erpnext_path,
+			branch=erpnext_branch or frappe_branch,
+			bench_path=path,
+			skip_assets=True,
+			verbose=verbose,
+			resolve_deps=False,
+		)
 
 	# getting app on bench init using --install-app
 	if install_app:
