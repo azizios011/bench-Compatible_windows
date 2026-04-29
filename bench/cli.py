@@ -28,6 +28,7 @@ from bench.utils import (
 	get_cmd_from_sysargv,
 )
 from bench.utils.bench import get_env_cmd
+from bench.utils.bench import resolve_compat_python
 from importlib.util import find_spec
 
 
@@ -247,12 +248,15 @@ def setup_clear_cache():
 
 
 def setup_compat_bootstrap():
-	_compat_mode = os.environ.get("BENCH_COMPAT_MODE")
-	_no_venv = os.environ.get("BENCH_NO_VENV")
 	compat_python = os.environ.get("BENCH_PYTHON")
 	if compat_python and not os.path.exists(compat_python):
 		log(f"BENCH_PYTHON does not exist: {compat_python}", level=3)
 		sys.exit(1)
+
+	if os.environ.get("BENCH_COMPAT_MODE") == "1" and not compat_python:
+		resolved = resolve_compat_python()
+		if resolved:
+			os.environ["BENCH_PYTHON"] = resolved
 
 
 def setup_exception_handler():

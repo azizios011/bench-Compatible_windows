@@ -31,10 +31,22 @@ from bench.utils import (
 logger = logging.getLogger(bench.PROJECT_NAME)
 
 
+def resolve_compat_python() -> str | None:
+	python_path = os.environ.get("BENCH_PYTHON")
+	if python_path:
+		return os.path.abspath(python_path)
+
+	if os.environ.get("BENCH_COMPAT_MODE") != "1":
+		return None
+
+	# Prefer explicit 3.14 in compat mode, then fall back to default python3.
+	return shutil.which("python3.14") or shutil.which("python3")
+
+
 @lru_cache(maxsize=None)
 def get_env_cmd(cmd: str, bench_path: str = ".") -> str:
 	compat_mode = os.environ.get("BENCH_COMPAT_MODE") == "1"
-	compat_python = os.environ.get("BENCH_PYTHON")
+	compat_python = resolve_compat_python()
 	cmd = cmd.strip("*")
 
 	if compat_mode and compat_python and cmd in {"python", "pip"}:

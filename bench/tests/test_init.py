@@ -64,8 +64,9 @@ class TestBenchInit(TestBenchBase):
 		try:
 			os.environ["BENCH_NO_VENV"] = "1"
 			os.environ.pop("BENCH_PYTHON", None)
-			with self.assertRaises(Exception):
-				setup.env()
+			with patch("bench.bench.resolve_compat_python", return_value=None):
+				with self.assertRaises(Exception):
+					setup.env()
 		finally:
 			if prev_no_venv is None:
 				os.environ.pop("BENCH_NO_VENV", None)
@@ -85,8 +86,30 @@ class TestBenchInit(TestBenchBase):
 			os.environ.pop("BENCH_PYTHON", None)
 			get_env_cmd.cache_clear()
 			expected = get_env_cmd("python", bench_path=".")
-			self.assertEqual(get_effective_python("."), expected)
+			with patch("bench.bench.resolve_compat_python", return_value=None):
+				self.assertEqual(get_effective_python("."), expected)
 		finally:
+			if prev_python is None:
+				os.environ.pop("BENCH_PYTHON", None)
+			else:
+				os.environ["BENCH_PYTHON"] = prev_python
+
+	def test_cli_bootstrap_sets_dynamic_python(self):
+		from bench.cli import setup_compat_bootstrap
+
+		prev_compat_mode = os.environ.get("BENCH_COMPAT_MODE")
+		prev_python = os.environ.get("BENCH_PYTHON")
+		try:
+			os.environ["BENCH_COMPAT_MODE"] = "1"
+			os.environ.pop("BENCH_PYTHON", None)
+			with patch("bench.cli.resolve_compat_python", return_value="/usr/bin/python3.14"):
+				setup_compat_bootstrap()
+			self.assertEqual(os.environ.get("BENCH_PYTHON"), "/usr/bin/python3.14")
+		finally:
+			if prev_compat_mode is None:
+				os.environ.pop("BENCH_COMPAT_MODE", None)
+			else:
+				os.environ["BENCH_COMPAT_MODE"] = prev_compat_mode
 			if prev_python is None:
 				os.environ.pop("BENCH_PYTHON", None)
 			else:

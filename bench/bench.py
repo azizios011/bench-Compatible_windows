@@ -32,6 +32,7 @@ from bench.utils.bench import (
 	remove_backups_crontab,
 	get_venv_path,
 	get_env_cmd,
+	resolve_compat_python,
 )
 from bench.utils.render import job, step
 from bench.utils.app import get_current_version
@@ -46,9 +47,9 @@ logger = logging.getLogger(bench.PROJECT_NAME)
 
 
 def get_effective_python(bench_path=".") -> str:
-	python = os.environ.get("BENCH_PYTHON")
+	python = resolve_compat_python()
 	if python:
-		return os.path.abspath(python)
+		return python
 	return get_env_cmd("python", bench_path=bench_path)
 
 
@@ -372,8 +373,10 @@ class BenchSetup(Base):
 		quiet_flag = "" if verbose else "--quiet"
 
 		if os.environ.get("BENCH_NO_VENV") == "1":
-			if not os.environ.get("BENCH_PYTHON"):
-				raise Exception("BENCH_NO_VENV=1 requires BENCH_PYTHON to be set")
+			if not resolve_compat_python():
+				raise Exception(
+					"BENCH_NO_VENV=1 requires BENCH_PYTHON or a discoverable python3.14/python3"
+				)
 			return
 
 		if not os.path.exists(self.bench.python):
