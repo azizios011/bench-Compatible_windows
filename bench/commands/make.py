@@ -265,6 +265,9 @@ def pip(ctx, args):
 	from bench.utils import use_uv
 	from bench.utils.bench import get_env_cmd
 
+	if "--break-system-packages" not in args:
+		args = args + ("--break-system-packages",)
+
 	env_py = get_env_cmd("python")
 	if use_uv() and (env_uv := shutil.which("uv")):
 		os.execv(env_uv, (env_uv, "pip") + args + ("--python", env_py))

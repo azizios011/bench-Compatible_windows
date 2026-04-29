@@ -271,9 +271,13 @@ class App(AppMeta):
 	@step(title="Uninstalling App {repo}", success="App {repo} Uninstalled")
 	def uninstall(self):
 		if use_uv():
-			self.bench.run(f"uv pip uninstall {self.name} --python {self.bench.python}")
+			self.bench.run(
+				f"uv pip uninstall --break-system-packages {self.name} --python {self.bench.python}"
+			)
 		else:
-			self.bench.run(f"{self.bench.python} -m pip uninstall -y {self.name}")
+			self.bench.run(
+				f"{self.bench.python} -m pip uninstall --break-system-packages -y {self.name}"
+			)
 
 	def _get_dependencies(self):
 		from bench.utils.app import get_required_deps, required_apps_from_hooks
@@ -939,7 +943,7 @@ def install_app(
 	if use_uv():
 		try:
 			bench.run(
-				f"uv pip install {quiet_flag} --upgrade -e {app_path} {cache_flag} --python {bench.python}",
+				f"uv pip install --break-system-packages {quiet_flag} --upgrade -e {app_path} {cache_flag} --python {bench.python}",
 				env=env,
 			)
 		except Exception as e:
@@ -948,7 +952,7 @@ def install_app(
 	else:
 		try:
 			bench.run(
-				f"{pip_cmd} install {quiet_flag} --upgrade -e {app_path} {cache_flag}",
+				f"{pip_cmd} install --break-system-packages {quiet_flag} --upgrade -e {app_path} {cache_flag}",
 				env=env,
 			)
 		except Exception as e:

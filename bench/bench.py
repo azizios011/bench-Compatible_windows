@@ -405,12 +405,12 @@ class BenchSetup(Base):
 
 				if use_uv():
 					self.run(
-						f"uv pip install {quiet_flag} --upgrade -e {frappe} --python {self.bench.python}",
+						f"uv pip install --break-system-packages {quiet_flag} --upgrade -e {frappe} --python {self.bench.python}",
 						cwd=self.bench.name, env=env,
 					)
 				else:
 					self.run(
-						f"{self.bench.python} -m pip install {quiet_flag} --upgrade -e {frappe}",
+						f"{self.bench.python} -m pip install --break-system-packages {quiet_flag} --upgrade -e {frappe}",
 						cwd=self.bench.name, env=env,
 					)
 
@@ -445,11 +445,12 @@ class BenchSetup(Base):
 
 		if use_uv():
 			return self.run(
-				f"uv pip install {quiet_flag} --upgrade pip{pip_version} --python {self.bench.python}", cwd=self.bench.name
+				f"uv pip install --break-system-packages {quiet_flag} --upgrade pip{pip_version} --python {self.bench.python}",
+				cwd=self.bench.name,
 			)
 
 		return self.run(
-			f"{self.bench.python} -m pip install {quiet_flag} --upgrade pip{pip_version}", cwd=self.bench.name
+			f"{self.bench.python} -m pip install --break-system-packages {quiet_flag} --upgrade pip{pip_version}", cwd=self.bench.name
 		)
 
 	@step(title="Installing wheel", success="Installed wheel")
@@ -463,11 +464,12 @@ class BenchSetup(Base):
 
 		if use_uv():
 			return self.run(
-				f"uv pip install {quiet_flag} wheel --python {self.bench.python}", cwd=self.bench.name
+				f"uv pip install --break-system-packages {quiet_flag} wheel --python {self.bench.python}",
+				cwd=self.bench.name,
 			)
 
 		return self.run(
-			f"{self.bench.python} -m pip install {quiet_flag} wheel", cwd=self.bench.name
+			f"{self.bench.python} -m pip install --break-system-packages {quiet_flag} wheel", cwd=self.bench.name
 		)
 
 	def logging(self):
@@ -547,9 +549,15 @@ class BenchSetup(Base):
 					}
 
 			if use_uv():
-				self.run(f"uv pip install {quiet_flag} --upgrade -e {app_path} --python {self.bench.python}", env=env)
+				self.run(
+					f"uv pip install --break-system-packages {quiet_flag} --upgrade -e {app_path} --python {self.bench.python}",
+					env=env,
+				)
 			else:
-				self.run(f"{self.bench.python} -m pip install {quiet_flag} --upgrade -e {app_path}", env=env)
+				self.run(
+					f"{self.bench.python} -m pip install --break-system-packages {quiet_flag} --upgrade -e {app_path}",
+					env=env,
+				)
 
 	def node(self, apps=None):
 		"""Install and upgrade Node dependencies for specified / all apps on given Bench"""
