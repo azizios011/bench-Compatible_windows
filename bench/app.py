@@ -38,6 +38,7 @@ from bench.utils import (
 	use_uv,
 )
 from bench.utils.bench import build_assets, install_python_dev_dependencies
+from bench.utils.bench import get_env_cmd
 from bench.utils.render import step
 
 if typing.TYPE_CHECKING:
@@ -699,6 +700,7 @@ def get_app(
 	bench_setup = False
 	restart_bench = not init_bench
 	frappe_path, frappe_branch = None, None
+	compat_mode = os.environ.get("BENCH_COMPAT_MODE") == "1"
 
 	if resolve_deps:
 		resolution = make_resolution_plan(app, bench)
@@ -762,6 +764,9 @@ def get_app(
 		return
 
 	dir_already_exists, cloned_path = check_existing_dir(bench_path, repo_name)
+	existing_symlink = compat_mode and os.path.islink(cloned_path)
+	if existing_symlink:
+		dir_already_exists = True
 	to_clone = not dir_already_exists
 
 	# application directory already exists
@@ -779,10 +784,8 @@ def get_app(
 	if to_clone:
 		app.get()
 
-	if (
-		to_clone
-		or overwrite
-		or click.confirm("Do you want to reinstall the existing application?")
+	if to_clone or overwrite or existing_symlink or click.confirm(
+		"Do you want to reinstall the existing application?"
 	):
 		app.install(verbose=verbose, skip_assets=skip_assets, restart_bench=restart_bench)
 
@@ -916,6 +919,7 @@ def install_app(
 	verbose = bench_cli.verbose or verbose
 	quiet_flag = "" if verbose else "--quiet"
 	cache_flag = "--no-cache-dir" if no_cache else ""
+	pip_cmd = get_env_cmd("pip", bench_path=bench_path)
 
 	app_path = os.path.realpath(os.path.join(bench_path, "apps", app))
 
@@ -944,7 +948,7 @@ def install_app(
 	else:
 		try:
 			bench.run(
-				f"{bench.python} -m pip install {quiet_flag} --upgrade -e {app_path} {cache_flag}",
+				f"{pip_cmd} install {quiet_flag} --upgrade -e {app_path} {cache_flag}",
 				env=env,
 			)
 		except Exception as e:

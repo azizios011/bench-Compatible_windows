@@ -3,6 +3,7 @@ import json
 import os
 import subprocess
 import unittest
+from unittest.mock import MagicMock, patch
 
 # imports - third paty imports
 import git
@@ -21,6 +22,76 @@ TEST_FRAPPE_APP = "frappe_docs"
 
 
 class TestBenchInit(TestBenchBase):
+	def test_skip_clone_flags_with_symlink_present(self):
+		with patch("bench.utils.system.Bench") as bench_cls, patch(
+			"bench.utils.system.get_app"
+		) as get_app_call, patch("bench.utils.system.build_assets"):
+			bench_obj = MagicMock()
+			bench_obj.setup = MagicMock()
+			bench_obj.conf = {}
+			bench_cls.return_value = bench_obj
+
+			bench_root = os.path.abspath("compat-bench")
+			os.makedirs(os.path.join(bench_root, "apps"), exist_ok=True)
+			frappe_target = os.path.join(bench_root, "apps", "frappe")
+			erpnext_target = os.path.join(bench_root, "apps", "erpnext")
+			os.symlink("/tmp", frappe_target)
+			os.symlink("/tmp", erpnext_target)
+			self.addCleanup(lambda: shutil.rmtree(bench_root, ignore_errors=True))
+
+			from bench.utils.system import init
+
+			init(
+				bench_root,
+				no_procfile=True,
+				no_backups=True,
+				skip_assets=True,
+				skip_frappe_clone=True,
+				skip_erpnext_clone=True,
+			)
+			get_app_call.assert_not_called()
+
+	def test_no_venv_requires_bench_python(self):
+		from bench.bench import BenchSetup
+
+		bench_stub = MagicMock()
+		bench_stub.name = "."
+		bench_stub.python = "/missing/python"
+		setup = BenchSetup(bench_stub)
+
+		prev_no_venv = os.environ.get("BENCH_NO_VENV")
+		prev_python = os.environ.get("BENCH_PYTHON")
+		try:
+			os.environ["BENCH_NO_VENV"] = "1"
+			os.environ.pop("BENCH_PYTHON", None)
+			with self.assertRaises(Exception):
+				setup.env()
+		finally:
+			if prev_no_venv is None:
+				os.environ.pop("BENCH_NO_VENV", None)
+			else:
+				os.environ["BENCH_NO_VENV"] = prev_no_venv
+			if prev_python is None:
+				os.environ.pop("BENCH_PYTHON", None)
+			else:
+				os.environ["BENCH_PYTHON"] = prev_python
+
+	def test_get_effective_python_fallback(self):
+		from bench.bench import get_effective_python
+		from bench.utils.bench import get_env_cmd
+
+		prev_python = os.environ.get("BENCH_PYTHON")
+		try:
+			os.environ.pop("BENCH_PYTHON", None)
+			get_env_cmd.cache_clear()
+			expected = get_env_cmd("python", bench_path=".")
+			self.assertEqual(get_effective_python("."), expected)
+		finally:
+			if prev_python is None:
+				os.environ.pop("BENCH_PYTHON", None)
+			else:
+				os.environ["BENCH_PYTHON"] = prev_python
+
 	def test_utils(self):
 		self.assertEqual(subprocess.call("bench"), 0)
 

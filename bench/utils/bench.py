@@ -33,8 +33,21 @@ logger = logging.getLogger(bench.PROJECT_NAME)
 
 @lru_cache(maxsize=None)
 def get_env_cmd(cmd: str, bench_path: str = ".") -> str:
+	compat_mode = os.environ.get("BENCH_COMPAT_MODE") == "1"
+	compat_python = os.environ.get("BENCH_PYTHON")
+	cmd = cmd.strip("*")
+
+	if compat_mode and compat_python and cmd in {"python", "pip"}:
+		python_path = os.path.abspath(compat_python)
+		if cmd == "python":
+			return python_path
+		python_dir = os.path.dirname(python_path)
+		compat_pip = os.path.join(python_dir, "pip")
+		if os.path.exists(compat_pip):
+			return compat_pip
+
 	exact_location = os.path.abspath(
-		os.path.join(bench_path, "env", "bin", cmd.strip("*"))
+		os.path.join(bench_path, "env", "bin", cmd)
 	)
 	if os.path.exists(exact_location):
 		return exact_location

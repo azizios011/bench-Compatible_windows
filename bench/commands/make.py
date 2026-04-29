@@ -23,6 +23,8 @@ import click
 @click.option("--frappe-path", default=None, help="path to frappe repo")
 @click.option("--erpnext-path", default=None, help="path to erpnext repo")
 @click.option("--erpnext-branch", default=None, help="Clone a particular branch of erpnext")
+@click.option("--skip-frappe-clone", is_flag=True, default=False, help="Skip frappe clone if app exists")
+@click.option("--skip-erpnext-clone", is_flag=True, default=False, help="Skip erpnext clone if app exists")
 @click.option("--clone-from", default=None, help="copy repos from path")
 @click.option(
 	"--clone-without-update", is_flag=True, help="copy repos from path without update"
@@ -54,6 +56,8 @@ def init(
 	erpnext_path,
 	frappe_branch,
 	erpnext_branch,
+	skip_frappe_clone,
+	skip_erpnext_clone,
 	no_procfile,
 	no_backups,
 	clone_from,
@@ -85,6 +89,8 @@ def init(
 			erpnext_path=erpnext_path,
 			frappe_branch=frappe_branch,
 			erpnext_branch=erpnext_branch,
+			skip_frappe_clone=skip_frappe_clone,
+			skip_erpnext_clone=skip_erpnext_clone,
 			install_app=install_app,
 			clone_from=clone_from,
 			skip_redis_config_generation=skip_redis_config_generation,

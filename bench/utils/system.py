@@ -38,6 +38,8 @@ def init(
 	python="python3",
 	install_app=None,
 	dev=False,
+	skip_frappe_clone=False,
+	skip_erpnext_clone=False,
 ):
 	"""Initialize a new bench directory
 
@@ -87,27 +89,31 @@ def init(
 		frappe_path = frappe_path or "https://github.com/azizios011/frappe-Compatible_windows.git"
 		erpnext_path = erpnext_path or "https://github.com/azizios011/erpnext-Compatible_windows.git"
 		is_valid_frappe_branch(frappe_path=frappe_path, frappe_branch=frappe_branch)
-		get_app(
-			frappe_path,
-			branch=frappe_branch,
-			bench_path=path,
-			skip_assets=True,
-			verbose=verbose,
-			resolve_deps=False,
-		)
+		frappe_app_path = os.path.join(path, "apps", "frappe")
+		if not (skip_frappe_clone and os.path.lexists(frappe_app_path)):
+			get_app(
+				frappe_path,
+				branch=frappe_branch,
+				bench_path=path,
+				skip_assets=True,
+				verbose=verbose,
+				resolve_deps=False,
+			)
 
 		# fetch remote apps using config file - deprecate this!
 		if apps_path:
 			install_apps_from_path(apps_path, bench_path=path)
 
-		get_app(
-			erpnext_path,
-			branch=erpnext_branch or frappe_branch,
-			bench_path=path,
-			skip_assets=True,
-			verbose=verbose,
-			resolve_deps=False,
-		)
+		erpnext_app_path = os.path.join(path, "apps", "erpnext")
+		if not (skip_erpnext_clone and os.path.lexists(erpnext_app_path)):
+			get_app(
+				erpnext_path,
+				branch=erpnext_branch or frappe_branch,
+				bench_path=path,
+				skip_assets=True,
+				verbose=verbose,
+				resolve_deps=False,
+			)
 
 	# getting app on bench init using --install-app
 	if install_app:

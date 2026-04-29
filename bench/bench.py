@@ -45,6 +45,13 @@ if TYPE_CHECKING:
 logger = logging.getLogger(bench.PROJECT_NAME)
 
 
+def get_effective_python(bench_path=".") -> str:
+	python = os.environ.get("BENCH_PYTHON")
+	if python:
+		return os.path.abspath(python)
+	return get_env_cmd("python", bench_path=bench_path)
+
+
 class Base:
 	def run(self, cmd, cwd=None, _raise=True, env=None):
 		return exec_cmd(cmd, cwd=cwd or self.cwd, _raise=_raise, env=env)
@@ -73,7 +80,7 @@ class Bench(Base, Validator):
 
 	@property
 	def python(self) -> str:
-		return get_env_cmd("python", bench_path=self.name)
+		return get_effective_python(bench_path=self.name)
 
 	@property
 	def shallow_clone(self) -> bool:
@@ -363,6 +370,11 @@ class BenchSetup(Base):
 
 		frappe = os.path.join(self.bench.name, "apps", "frappe")
 		quiet_flag = "" if verbose else "--quiet"
+
+		if os.environ.get("BENCH_NO_VENV") == "1":
+			if not os.environ.get("BENCH_PYTHON"):
+				raise Exception("BENCH_NO_VENV=1 requires BENCH_PYTHON to be set")
+			return
 
 		if not os.path.exists(self.bench.python):
 			if use_uv():

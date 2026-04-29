@@ -5,6 +5,7 @@ import os
 import shutil
 import subprocess
 import sys
+import tempfile
 import traceback
 import unittest
 
@@ -12,6 +13,7 @@ import unittest
 from bench.utils import paths_in_bench, exec_cmd
 from bench.utils.system import init
 from bench.bench import Bench
+from bench.utils.bench import get_env_cmd
 
 PYTHON_VER = sys.version_info
 
@@ -132,3 +134,29 @@ class TestBenchBase(unittest.TestCase):
 		exc_type, exc_value, exc_tb = sys.exc_info()
 		trace_list = traceback.format_exception(exc_type, exc_value, exc_tb)
 		return "".join(str(t) for t in trace_list)
+
+	def test_get_env_cmd_compat_mode(self):
+		with tempfile.TemporaryDirectory() as tmpdir:
+			python_path = os.path.join(tmpdir, "python")
+			pip_path = os.path.join(tmpdir, "pip")
+			open(python_path, "w").close()
+			open(pip_path, "w").close()
+
+			prev_compat_mode = os.environ.get("BENCH_COMPAT_MODE")
+			prev_python = os.environ.get("BENCH_PYTHON")
+			try:
+				os.environ["BENCH_COMPAT_MODE"] = "1"
+				os.environ["BENCH_PYTHON"] = python_path
+				get_env_cmd.cache_clear()
+				self.assertEqual(get_env_cmd("python"), python_path)
+				self.assertEqual(get_env_cmd("pip"), pip_path)
+			finally:
+				if prev_compat_mode is None:
+					os.environ.pop("BENCH_COMPAT_MODE", None)
+				else:
+					os.environ["BENCH_COMPAT_MODE"] = prev_compat_mode
+				if prev_python is None:
+					os.environ.pop("BENCH_PYTHON", None)
+				else:
+					os.environ["BENCH_PYTHON"] = prev_python
+				get_env_cmd.cache_clear()
