@@ -86,8 +86,11 @@ def init(
 
 	# remote apps
 	else:
+		default_branch = "axeane_kompta"
 		frappe_path = frappe_path or "https://github.com/azizios011/frappe-Compatible_windows.git"
 		erpnext_path = erpnext_path or "https://github.com/azizios011/erpnext-Compatible_windows.git"
+		frappe_branch = frappe_branch or default_branch
+		erpnext_branch = erpnext_branch or default_branch
 		is_valid_frappe_branch(frappe_path=frappe_path, frappe_branch=frappe_branch)
 		frappe_app_path = os.path.join(path, "apps", "frappe")
 		if not (skip_frappe_clone and os.path.lexists(frappe_app_path)):
@@ -108,7 +111,7 @@ def init(
 		if not (skip_erpnext_clone and os.path.lexists(erpnext_app_path)):
 			get_app(
 				erpnext_path,
-				branch=erpnext_branch or frappe_branch,
+				branch=erpnext_branch,
 				bench_path=path,
 				skip_assets=True,
 				verbose=verbose,
