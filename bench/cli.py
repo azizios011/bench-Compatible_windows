@@ -11,7 +11,7 @@ import click
 
 # imports - module imports
 import bench
-from bench.bench import Bench
+from bench.bench import Bench, get_effective_python
 from bench.commands import bench_command
 from bench.config.common_site_config import get_config
 from bench.utils import (
@@ -28,6 +28,7 @@ from bench.utils import (
 	get_cmd_from_sysargv,
 )
 from bench.utils.bench import get_env_cmd
+from bench.utils.bench import resolve_compat_python
 from importlib.util import find_spec
 
 
@@ -65,6 +66,8 @@ def execute_cmd(check_for_update=True, command: str = None, logger: Logger = Non
 def cli():
 	setup_clear_cache()
 	global from_command_line, bench_config, is_envvar_warn_set, verbose
+
+	setup_compat_bootstrap()
 
 	from_command_line = True
 	command = " ".join(sys.argv)
@@ -190,13 +193,13 @@ def change_uid():
 
 
 def app_cmd(bench_path="."):
-	f = get_env_cmd("python", bench_path=bench_path)
+	f = get_effective_python(bench_path=bench_path)
 	os.chdir(os.path.join(bench_path, "sites"))
 	os.execv(f, [f] + ["-m", "frappe.utils.bench_helper"] + sys.argv[1:])
 
 
 def frappe_cmd(bench_path="."):
-	f = get_env_cmd("python", bench_path=bench_path)
+	f = get_effective_python(bench_path=bench_path)
 	os.chdir(os.path.join(bench_path, "sites"))
 	os.execv(f, [f] + ["-m", "frappe.utils.bench_helper", "frappe"] + sys.argv[1:])
 
@@ -209,7 +212,7 @@ def get_frappe_commands():
 
 
 def get_frappe_help(bench_path="."):
-	python = get_env_cmd("python", bench_path=bench_path)
+	python = get_effective_python(bench_path=bench_path)
 	sites_path = os.path.join(bench_path, "sites")
 	try:
 		out = get_cmd_output(
@@ -242,6 +245,18 @@ def setup_clear_cache():
 		return f(*args, **kwargs)
 
 	os.chdir = _chdir
+
+
+def setup_compat_bootstrap():
+	compat_python = os.environ.get("BENCH_PYTHON")
+	if compat_python and not os.path.exists(compat_python):
+		log(f"BENCH_PYTHON does not exist: {compat_python}", level=3)
+		sys.exit(1)
+
+	if os.environ.get("BENCH_COMPAT_MODE") == "1" and not compat_python:
+		resolved = resolve_compat_python()
+		if resolved:
+			os.environ["BENCH_PYTHON"] = resolved
 
 
 def setup_exception_handler():

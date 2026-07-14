@@ -49,9 +49,6 @@ from bench.commands.make import (
 	validate_dependencies,
 )
 
-from bench.commands.socketio import socketio
-
-bench_command.add_command(socketio)
 bench_command.add_command(init)
 bench_command.add_command(drop)
 bench_command.add_command(get_app)

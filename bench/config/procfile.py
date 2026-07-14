@@ -1,5 +1,6 @@
 import os
 import platform
+import shlex
 
 import click
 
@@ -38,6 +39,11 @@ def setup_procfile(bench_path, yes=False, skip_redis=False, skip_web=False, skip
 			is_mac=is_mac,
 		)
 	)
+
+	if os.environ.get("BENCH_COMPAT_MODE") == "1" and os.environ.get("BENCH_PYTHON"):
+		python_path = shlex.quote(os.environ["BENCH_PYTHON"])
+		procfile = procfile.replace(" bench ", f" BENCH_PYTHON={python_path} bench ")
+		procfile = procfile.replace(": bench ", f": BENCH_PYTHON={python_path} bench ")
 
 	with open(procfile_path, "w") as f:
 		f.write(procfile)
