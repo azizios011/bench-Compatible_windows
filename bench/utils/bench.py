@@ -31,10 +31,35 @@ from bench.utils import (
 logger = logging.getLogger(bench.PROJECT_NAME)
 
 
+def resolve_compat_python() -> str | None:
+	python_path = os.environ.get("BENCH_PYTHON")
+	if python_path:
+		return os.path.abspath(python_path)
+
+	if os.environ.get("BENCH_COMPAT_MODE") != "1":
+		return None
+
+	# Prefer explicit 3.14 in compat mode, then fall back to default python3.
+	return shutil.which("python3.14") or shutil.which("python3")
+
+
 @lru_cache(maxsize=None)
 def get_env_cmd(cmd: str, bench_path: str = ".") -> str:
+	compat_mode = os.environ.get("BENCH_COMPAT_MODE") == "1"
+	compat_python = resolve_compat_python()
+	cmd = cmd.strip("*")
+
+	if compat_mode and compat_python and cmd in {"python", "pip"}:
+		python_path = os.path.abspath(compat_python)
+		if cmd == "python":
+			return python_path
+		python_dir = os.path.dirname(python_path)
+		compat_pip = os.path.join(python_dir, "pip")
+		if os.path.exists(compat_pip):
+			return compat_pip
+
 	exact_location = os.path.abspath(
-		os.path.join(bench_path, "env", "bin", cmd.strip("*"))
+		os.path.join(bench_path, "env", "bin", cmd)
 	)
 	if os.path.exists(exact_location):
 		return exact_location
@@ -101,18 +126,22 @@ def install_python_dev_dependencies(bench_path=".", apps=None, verbose=False):
 			pyproject_deps = _generate_dev_deps_pattern(pyproject_path)
 			if pyproject_deps:
 				if use_uv():
-					bench.run(f"uv pip install {quiet_flag} {pyproject_deps} --python {bench.python}")
+					bench.run(
+						f"uv pip install --break-system-packages {quiet_flag} --upgrade {pyproject_deps} --python {bench.python}"
+					)
 				else:
-					bench.run(f"{bench.python} -m pip install {quiet_flag} --upgrade {pyproject_deps}")
+					bench.run(
+						f"{bench.python} -m pip install --break-system-packages {quiet_flag} --upgrade {pyproject_deps}"
+					)
 
 		if not pyproject_deps and os.path.exists(dev_requirements_path):
 			if use_uv():
 				bench.run(
-					f"uv pip install {quiet_flag} -r {dev_requirements_path} --python {bench.python}"
+					f"uv pip install --break-system-packages {quiet_flag} --upgrade -r {dev_requirements_path} --python {bench.python}"
 				)
 			else:
 				bench.run(
-					f"{bench.python} -m pip install {quiet_flag} --upgrade -r {dev_requirements_path}"
+					f"{bench.python} -m pip install --break-system-packages {quiet_flag} --upgrade -r {dev_requirements_path}"
 				)
 
 
@@ -250,9 +279,13 @@ def migrate_env(python, backup=False):
 	def _install_app(app, pyenv):
 		app_path = f"-e {os.path.join('apps', app)}"
 		if use_uv():
-			exec_cmd(f"uv pip install {app_path} --python {pyenv}/bin/python")
+			exec_cmd(
+				f"uv pip install --break-system-packages --upgrade {app_path} --python {pyenv}/bin/python"
+			)
 		else:
-			exec_cmd(f"{pyenv}/bin/python -m pip install --upgrade {app_path}")
+			exec_cmd(
+				f"{pyenv}/bin/python -m pip install --break-system-packages --upgrade {app_path}"
+			)
 
 	try:
 		logger.log(f"Setting up a New Virtual {python} Environment")

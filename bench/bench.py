@@ -32,9 +32,10 @@ from bench.utils.bench import (
 	remove_backups_crontab,
 	get_venv_path,
 	get_env_cmd,
+	resolve_compat_python,
 )
 from bench.utils.render import job, step
-from bench.utils.app import get_app_name, get_current_version
+from bench.utils.app import get_current_version
 from bench.utils.system import get_mariadb_pkgconfig_path, check_pkg_config
 from bench.app import is_git_repo
 
@@ -43,6 +44,13 @@ if TYPE_CHECKING:
 	from bench.app import App
 
 logger = logging.getLogger(bench.PROJECT_NAME)
+
+
+def get_effective_python(bench_path=".") -> str:
+	python = resolve_compat_python()
+	if python:
+		return python
+	return get_env_cmd("python", bench_path=bench_path)
 
 
 class Base:
@@ -73,7 +81,7 @@ class Bench(Base, Validator):
 
 	@property
 	def python(self) -> str:
-		return get_env_cmd("python", bench_path=self.name)
+		return get_effective_python(bench_path=self.name)
 
 	@property
 	def shallow_clone(self) -> bool:
@@ -365,6 +373,13 @@ class BenchSetup(Base):
 		frappe = os.path.join(self.bench.name, "apps", "frappe")
 		quiet_flag = "" if verbose else "--quiet"
 
+		if os.environ.get("BENCH_NO_VENV") == "1":
+			if not resolve_compat_python():
+				raise Exception(
+					"BENCH_NO_VENV=1 requires BENCH_PYTHON or a discoverable python3.14/python3"
+				)
+			return
+
 		if not os.path.exists(self.bench.python):
 			if use_uv():
 				if os.environ.get("FRAPPE_DOCKER_BUILD"):
@@ -391,12 +406,12 @@ class BenchSetup(Base):
 
 				if use_uv():
 					self.run(
-						f"uv pip install {quiet_flag} -e {frappe} --python {self.bench.python}",
+						f"uv pip install --break-system-packages {quiet_flag} --upgrade -e {frappe} --python {self.bench.python}",
 						cwd=self.bench.name, env=env,
 					)
 				else:
 					self.run(
-						f"{self.bench.python} -m pip install {quiet_flag} --upgrade -e {frappe}",
+						f"{self.bench.python} -m pip install --break-system-packages {quiet_flag} --upgrade -e {frappe}",
 						cwd=self.bench.name, env=env,
 					)
 
@@ -431,11 +446,12 @@ class BenchSetup(Base):
 
 		if use_uv():
 			return self.run(
-				f"uv pip install {quiet_flag} --upgrade pip{pip_version} --python {self.bench.python}", cwd=self.bench.name
+				f"uv pip install --break-system-packages {quiet_flag} --upgrade pip{pip_version} --python {self.bench.python}",
+				cwd=self.bench.name,
 			)
 
 		return self.run(
-			f"{self.bench.python} -m pip install {quiet_flag} --upgrade pip{pip_version}", cwd=self.bench.name
+			f"{self.bench.python} -m pip install --break-system-packages {quiet_flag} --upgrade pip{pip_version}", cwd=self.bench.name
 		)
 
 	@step(title="Installing wheel", success="Installed wheel")
@@ -449,11 +465,12 @@ class BenchSetup(Base):
 
 		if use_uv():
 			return self.run(
-				f"uv pip install {quiet_flag} wheel --python {self.bench.python}", cwd=self.bench.name
+				f"uv pip install --break-system-packages {quiet_flag} wheel --python {self.bench.python}",
+				cwd=self.bench.name,
 			)
 
 		return self.run(
-			f"{self.bench.python} -m pip install {quiet_flag} wheel", cwd=self.bench.name
+			f"{self.bench.python} -m pip install --break-system-packages {quiet_flag} wheel", cwd=self.bench.name
 		)
 
 	def logging(self):
@@ -533,17 +550,15 @@ class BenchSetup(Base):
 					}
 
 			if use_uv():
-				upgrade_package = get_app_name(self.bench.name, app)
-				# Scope the upgrade to the app itself so uv doesn't eagerly bump shared
-				# transitive deps that already satisfy other installed apps' constraints.
-				# `uv pip install --upgrade` upgrades everything (eager), unlike pip's
-				# default only-if-needed strategy. See frappe/bench#1683.
 				self.run(
-					f"uv pip install {quiet_flag} --upgrade-package {upgrade_package} -e {app_path} --python {self.bench.python}",
+					f"uv pip install --break-system-packages {quiet_flag} --upgrade -e {app_path} --python {self.bench.python}",
 					env=env,
 				)
 			else:
-				self.run(f"{self.bench.python} -m pip install {quiet_flag} --upgrade -e {app_path}", env=env)
+				self.run(
+					f"{self.bench.python} -m pip install --break-system-packages {quiet_flag} --upgrade -e {app_path}",
+					env=env,
+				)
 
 	def node(self, apps=None):
 		"""Install and upgrade Node dependencies for specified / all apps on given Bench"""
