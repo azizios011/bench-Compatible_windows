@@ -28,8 +28,10 @@ def init(
 	no_backups=False,
 	frappe_path=None,
 	erpnext_path=None,
+	print_designer_path=None,
 	frappe_branch=None,
 	erpnext_branch=None,
+	print_designer_branch=None,
 	verbose=False,
 	clone_from=None,
 	skip_redis_config_generation=False,
@@ -40,6 +42,7 @@ def init(
 	dev=False,
 	skip_frappe_clone=False,
 	skip_erpnext_clone=False,
+	skip_print_designer_clone=False,
 ):
 	"""Initialize a new bench directory
 
@@ -112,6 +115,19 @@ def init(
 			get_app(
 				erpnext_path,
 				branch=erpnext_branch,
+				bench_path=path,
+				skip_assets=True,
+				verbose=verbose,
+				resolve_deps=False,
+			)
+
+		print_designer_path = print_designer_path or "https://github.com/azizios011/Print-Designer_Compatible_windows.git"
+		print_designer_branch = print_designer_branch or default_branch
+		print_designer_app_path = os.path.join(path, "apps", "print_designer")
+		if not (skip_print_designer_clone and os.path.lexists(print_designer_app_path)):
+			get_app(
+				print_designer_path,
+				branch=print_designer_branch,
 				bench_path=path,
 				skip_assets=True,
 				verbose=verbose,
