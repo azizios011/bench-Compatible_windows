@@ -454,20 +454,27 @@ def get_env_frappe_commands(bench_path=".") -> List:
 def find_org(org_repo, using_cached: bool = False):
 	import requests
 
-	org_repo = org_repo[0]
+	org_repo_name = org_repo[0]
 
 	for org in ["azizios011"]:
-		res = requests.head(f"https://api.github.com/repos/{org}/{org_repo}")
-		if res.status_code in (400, 403):
-			res = requests.head(f"https://github.com/{org}/{org_repo}")
-		if res.ok:
-			return org, org_repo
+		# Try exact repo name first, then known suffix patterns for compatible windows forks
+		repo_candidates = [
+			org_repo_name,
+			f"{org_repo_name}-Compatible_windows",
+			f"{org_repo_name}_Compatible_windows",
+		]
+		for candidate in repo_candidates:
+			res = requests.head(f"https://api.github.com/repos/{org}/{candidate}")
+			if res.status_code in (400, 403):
+				res = requests.head(f"https://github.com/{org}/{candidate}")
+			if res.ok:
+				return org, candidate
 
 	if using_cached:
-		return "", org_repo
+		return "", org_repo_name
 
 	raise InvalidRemoteException(
-		f"{org_repo} not found under frappe or erpnext GitHub accounts"
+		f"{org_repo_name} not found under frappe or erpnext GitHub accounts"
 	)
 
 
