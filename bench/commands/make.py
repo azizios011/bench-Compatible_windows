@@ -24,15 +24,18 @@ import click
 @click.option("--erpnext-path", default=None, help="path to erpnext repo")
 @click.option("--print-designer-path", default=None, help="path to print_designer repo")
 @click.option("--hrms-path", default=None, help="path to hrms repo")
+@click.option("--payments-path", default=None, help="path to payments repo")
 @click.option("--webshop-path", default=None, help="path to webshop repo")
 @click.option("--erpnext-branch", default=None, help="Clone a particular branch of erpnext")
 @click.option("--print-designer-branch", default=None, help="Clone a particular branch of print_designer")
 @click.option("--hrms-branch", default=None, help="Clone a particular branch of hrms")
+@click.option("--payments-branch", default=None, help="Clone a particular branch of payments")
 @click.option("--webshop-branch", default=None, help="Clone a particular branch of webshop")
 @click.option("--skip-frappe-clone", is_flag=True, default=False, help="Skip frappe clone if app exists")
 @click.option("--skip-erpnext-clone", is_flag=True, default=False, help="Skip erpnext clone if app exists")
 @click.option("--skip-print-designer-clone", is_flag=True, default=False, help="Skip print_designer clone if app exists")
 @click.option("--skip-hrms-clone", is_flag=True, default=False, help="Skip hrms clone if app exists")
+@click.option("--skip-payments-clone", is_flag=True, default=False, help="Skip payments clone if app exists")
 @click.option("--skip-webshop-clone", is_flag=True, default=False, help="Skip webshop clone if app exists")
 @click.option("--clone-from", default=None, help="copy repos from path")
 @click.option(
@@ -65,16 +68,19 @@ def init(
 	erpnext_path,
 	print_designer_path,
 	hrms_path,
+	payments_path,
 	webshop_path,
 	frappe_branch,
 	erpnext_branch,
 	print_designer_branch,
 	hrms_branch,
+	payments_branch,
 	webshop_branch,
 	skip_frappe_clone,
 	skip_erpnext_clone,
 	skip_print_designer_clone,
 	skip_hrms_clone,
+	skip_payments_clone,
 	skip_webshop_clone,
 	no_procfile,
 	no_backups,
@@ -107,16 +113,19 @@ def init(
 			erpnext_path=erpnext_path,
 			print_designer_path=print_designer_path,
 			hrms_path=hrms_path,
+			payments_path=payments_path,
 			webshop_path=webshop_path,
 			frappe_branch=frappe_branch,
 			erpnext_branch=erpnext_branch,
 			print_designer_branch=print_designer_branch,
 			hrms_branch=hrms_branch,
+			payments_branch=payments_branch,
 			webshop_branch=webshop_branch,
 			skip_frappe_clone=skip_frappe_clone,
 			skip_erpnext_clone=skip_erpnext_clone,
 			skip_print_designer_clone=skip_print_designer_clone,
 			skip_hrms_clone=skip_hrms_clone,
+			skip_payments_clone=skip_payments_clone,
 			skip_webshop_clone=skip_webshop_clone,
 			install_app=install_app,
 			clone_from=clone_from,
