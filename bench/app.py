@@ -184,6 +184,10 @@ class App(AppMeta):
 		self.cache_key = cache_key
 		self.pyproject = None
 		super().__init__(name, branch, *args, **kwargs)
+		
+		# Set default branch for specific apps if not explicitly provided
+		if not branch and self.repo in ["payments", "webshop"]:
+			self.branch = self.tag = "axeane_kompta"
 
 	@step(title="Fetching App {repo}", success="App {repo} Fetched")
 	def get(self):
