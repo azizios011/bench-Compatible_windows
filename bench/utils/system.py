@@ -30,11 +30,13 @@ def init(
 	erpnext_path=None,
 	print_designer_path=None,
 	hrms_path=None,
+	payments_path=None,
 	webshop_path=None,
 	frappe_branch=None,
 	erpnext_branch=None,
 	print_designer_branch=None,
 	hrms_branch=None,
+	payments_branch=None,
 	webshop_branch=None,
 	verbose=False,
 	clone_from=None,
@@ -48,6 +50,7 @@ def init(
 	skip_erpnext_clone=False,
 	skip_print_designer_clone=False,
 	skip_hrms_clone=False,
+	skip_payments_clone=False,
 	skip_webshop_clone=False,
 ):
 	"""Initialize a new bench directory
@@ -147,6 +150,19 @@ def init(
 			get_app(
 				hrms_path,
 				branch=hrms_branch,
+				bench_path=path,
+				skip_assets=True,
+				verbose=verbose,
+				resolve_deps=False,
+			)
+
+		payments_path = payments_path or "https://github.com/azizios011/payments-Compatible_windows.git"
+		payments_branch = payments_branch or default_branch
+		payments_app_path = os.path.join(path, "apps", "payments")
+		if not (skip_payments_clone and os.path.lexists(payments_app_path)):
+			get_app(
+				payments_path,
+				branch=payments_branch,
 				bench_path=path,
 				skip_assets=True,
 				verbose=verbose,
