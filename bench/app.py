@@ -185,8 +185,11 @@ class App(AppMeta):
 		self.pyproject = None
 		super().__init__(name, branch, *args, **kwargs)
 		
-		# Set default branch for specific apps if not explicitly provided
-		if not branch and self.repo in ["payments", "webshop", "builder"]:
+		# Set default branch for specific apps if not explicitly provided.
+		# Normalize repo names like "builder-Compatible_windows" to "builder" so the
+		# keyword works even when the app is resolved from the forked repo name.
+		normalized_repo = self.repo.lower().replace("-compatible_windows", "").replace("_compatible_windows", "")
+		if not branch and normalized_repo in ["payments", "webshop", "builder"]:
 			self.branch = self.tag = "axeane_kompta"
 
 	@step(title="Fetching App {repo}", success="App {repo} Fetched")
