@@ -186,7 +186,7 @@ class App(AppMeta):
 		super().__init__(name, branch, *args, **kwargs)
 		
 		# Set default branch for specific apps if not explicitly provided
-		if not branch and self.repo in ["payments", "webshop"]:
+		if not branch and self.repo in ["payments", "webshop", "builder"]:
 			self.branch = self.tag = "axeane_kompta"
 
 	@step(title="Fetching App {repo}", success="App {repo} Fetched")

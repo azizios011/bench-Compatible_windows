@@ -32,12 +32,14 @@ def init(
 	hrms_path=None,
 	payments_path=None,
 	webshop_path=None,
+	builder_path=None,
 	frappe_branch=None,
 	erpnext_branch=None,
 	print_designer_branch=None,
 	hrms_branch=None,
 	payments_branch=None,
 	webshop_branch=None,
+	builder_branch=None,
 	verbose=False,
 	clone_from=None,
 	skip_redis_config_generation=False,
@@ -52,6 +54,7 @@ def init(
 	skip_hrms_clone=False,
 	skip_payments_clone=False,
 	skip_webshop_clone=False,
+	skip_builder_clone=False,
 ):
 	"""Initialize a new bench directory
 
@@ -176,6 +179,19 @@ def init(
 			get_app(
 				webshop_path,
 				branch=webshop_branch,
+				bench_path=path,
+				skip_assets=True,
+				verbose=verbose,
+				resolve_deps=False,
+			)
+
+		builder_path = builder_path or "https://github.com/azizios011/builder-Compatible_windows.git"
+		builder_branch = builder_branch or default_branch
+		builder_app_path = os.path.join(path, "apps", "builder")
+		if not (skip_builder_clone and os.path.lexists(builder_app_path)):
+			get_app(
+				builder_path,
+				branch=builder_branch,
 				bench_path=path,
 				skip_assets=True,
 				verbose=verbose,
