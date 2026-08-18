@@ -27,12 +27,16 @@ import click
 @click.option("--payments-path", default=None, help="path to payments repo")
 @click.option("--webshop-path", default=None, help="path to webshop repo")
 @click.option("--builder-path", default=None, help="path to builder repo")
+@click.option("--crm-path", default=None, help="path to crm repo")
+@click.option("--drive-path", default=None, help="path to drive repo")
 @click.option("--erpnext-branch", default=None, help="Clone a particular branch of erpnext")
 @click.option("--print-designer-branch", default=None, help="Clone a particular branch of print_designer")
 @click.option("--hrms-branch", default=None, help="Clone a particular branch of hrms")
 @click.option("--payments-branch", default=None, help="Clone a particular branch of payments")
 @click.option("--webshop-branch", default=None, help="Clone a particular branch of webshop")
 @click.option("--builder-branch", default=None, help="Clone a particular branch of builder")
+@click.option("--crm-branch", default=None, help="Clone a particular branch of crm")
+@click.option("--drive-branch", default=None, help="Clone a particular branch of drive")
 @click.option("--skip-frappe-clone", is_flag=True, default=False, help="Skip frappe clone if app exists")
 @click.option("--skip-erpnext-clone", is_flag=True, default=False, help="Skip erpnext clone if app exists")
 @click.option("--skip-print-designer-clone", is_flag=True, default=False, help="Skip print_designer clone if app exists")
@@ -40,6 +44,8 @@ import click
 @click.option("--skip-payments-clone", is_flag=True, default=False, help="Skip payments clone if app exists")
 @click.option("--skip-webshop-clone", is_flag=True, default=False, help="Skip webshop clone if app exists")
 @click.option("--skip-builder-clone", is_flag=True, default=False, help="Skip builder clone if app exists")
+@click.option("--skip-crm-clone", is_flag=True, default=False, help="Skip crm clone if app exists")
+@click.option("--skip-drive-clone", is_flag=True, default=False, help="Skip drive clone if app exists")
 @click.option("--clone-from", default=None, help="copy repos from path")
 @click.option(
 	"--clone-without-update", is_flag=True, help="copy repos from path without update"
@@ -74,6 +80,8 @@ def init(
 	payments_path,
 	webshop_path,
 	builder_path,
+	crm_path,
+	drive_path,
 	frappe_branch,
 	erpnext_branch,
 	print_designer_branch,
@@ -81,6 +89,8 @@ def init(
 	payments_branch,
 	webshop_branch,
 	builder_branch,
+	crm_branch,
+	drive_branch,
 	skip_frappe_clone,
 	skip_erpnext_clone,
 	skip_print_designer_clone,
@@ -88,6 +98,8 @@ def init(
 	skip_payments_clone,
 	skip_webshop_clone,
 	skip_builder_clone,
+	skip_crm_clone,
+	skip_drive_clone,
 	no_procfile,
 	no_backups,
 	clone_from,
@@ -122,6 +134,8 @@ def init(
 			payments_path=payments_path,
 			webshop_path=webshop_path,
 			builder_path=builder_path,
+			crm_path=crm_path,
+			drive_path=drive_path,
 			frappe_branch=frappe_branch,
 			erpnext_branch=erpnext_branch,
 			print_designer_branch=print_designer_branch,
@@ -129,6 +143,8 @@ def init(
 			payments_branch=payments_branch,
 			webshop_branch=webshop_branch,
 			builder_branch=builder_branch,
+			crm_branch=crm_branch,
+			drive_branch=drive_branch,
 			skip_frappe_clone=skip_frappe_clone,
 			skip_erpnext_clone=skip_erpnext_clone,
 			skip_print_designer_clone=skip_print_designer_clone,
@@ -136,6 +152,8 @@ def init(
 			skip_payments_clone=skip_payments_clone,
 			skip_webshop_clone=skip_webshop_clone,
 			skip_builder_clone=skip_builder_clone,
+			skip_crm_clone=skip_crm_clone,
+			skip_drive_clone=skip_drive_clone,
 			install_app=install_app,
 			clone_from=clone_from,
 			skip_redis_config_generation=skip_redis_config_generation,
