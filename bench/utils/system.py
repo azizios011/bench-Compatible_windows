@@ -33,6 +33,8 @@ def init(
 	payments_path=None,
 	webshop_path=None,
 	builder_path=None,
+	crm_path=None,
+	drive_path=None,
 	frappe_branch=None,
 	erpnext_branch=None,
 	print_designer_branch=None,
@@ -40,6 +42,8 @@ def init(
 	payments_branch=None,
 	webshop_branch=None,
 	builder_branch=None,
+	crm_branch=None,
+	drive_branch=None,
 	verbose=False,
 	clone_from=None,
 	skip_redis_config_generation=False,
@@ -55,6 +59,8 @@ def init(
 	skip_payments_clone=False,
 	skip_webshop_clone=False,
 	skip_builder_clone=False,
+	skip_crm_clone=False,
+	skip_drive_clone=False,
 ):
 	"""Initialize a new bench directory
 
@@ -192,6 +198,32 @@ def init(
 			get_app(
 				builder_path,
 				branch=builder_branch,
+				bench_path=path,
+				skip_assets=True,
+				verbose=verbose,
+				resolve_deps=False,
+			)
+
+		crm_path = crm_path or "https://github.com/azizios011/crm-Compatible_windows.git"
+		crm_branch = crm_branch or default_branch
+		crm_app_path = os.path.join(path, "apps", "crm")
+		if not (skip_crm_clone and os.path.lexists(crm_app_path)):
+			get_app(
+				crm_path,
+				branch=crm_branch,
+				bench_path=path,
+				skip_assets=True,
+				verbose=verbose,
+				resolve_deps=False,
+			)
+
+		drive_path = drive_path or "https://github.com/azizios011/drive-Compatible_windows.git"
+		drive_branch = drive_branch or default_branch
+		drive_app_path = os.path.join(path, "apps", "drive")
+		if not (skip_drive_clone and os.path.lexists(drive_app_path)):
+			get_app(
+				drive_path,
+				branch=drive_branch,
 				bench_path=path,
 				skip_assets=True,
 				verbose=verbose,
