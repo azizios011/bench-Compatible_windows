@@ -131,6 +131,9 @@ def cli():
 		bench_command()
 
 	if cmd_from_sys in bench_command.commands:
+		from bench.utils.gh_auth import ensure_github_token
+
+		ensure_github_token(cmd_from_sys)
 		with execute_cmd(check_for_update=is_cli_command, command=command, logger=logger):
 			bench_command()
 
