@@ -109,9 +109,7 @@ def init(
 	else:
 		default_branch = "axeane_kompta"
 		frappe_path = frappe_path or "https://github.com/azizios011/frappe-Compatible_windows.git"
-		erpnext_path = erpnext_path or "https://github.com/azizios011/erpnext-Compatible_windows.git"
 		frappe_branch = frappe_branch or default_branch
-		erpnext_branch = erpnext_branch or default_branch
 		is_valid_frappe_branch(frappe_path=frappe_path, frappe_branch=frappe_branch)
 		frappe_app_path = os.path.join(path, "apps", "frappe")
 		if not (skip_frappe_clone and os.path.lexists(frappe_app_path)):
@@ -128,107 +126,82 @@ def init(
 		if apps_path:
 			install_apps_from_path(apps_path, bench_path=path)
 
-		erpnext_app_path = os.path.join(path, "apps", "erpnext")
-		if not (skip_erpnext_clone and os.path.lexists(erpnext_app_path)):
-			get_app(
+		# Each entry: app folder name -> (path_flag_value, branch_flag_value, default_url, skip_clone_flag)
+		# path_flag_value is None only when the flag was never passed on the command line
+		# (it's "" for a bare flag, or a real URL/path when one was given).
+		app_specs = {
+			"erpnext": (
 				erpnext_path,
-				branch=erpnext_branch,
-				bench_path=path,
-				skip_assets=True,
-				verbose=verbose,
-				resolve_deps=False,
-			)
-
-		print_designer_path = print_designer_path or "https://github.com/azizios011/Print-Designer_Compatible_windows.git"
-		print_designer_branch = print_designer_branch or default_branch
-		print_designer_app_path = os.path.join(path, "apps", "print_designer")
-		if not (skip_print_designer_clone and os.path.lexists(print_designer_app_path)):
-			get_app(
+				erpnext_branch,
+				"https://github.com/azizios011/erpnext-Compatible_windows.git",
+				skip_erpnext_clone,
+			),
+			"print_designer": (
 				print_designer_path,
-				branch=print_designer_branch,
-				bench_path=path,
-				skip_assets=True,
-				verbose=verbose,
-				resolve_deps=False,
-			)
-
-		hrms_path = hrms_path or "https://github.com/azizios011/hrms_Compatible_windows.git"
-		hrms_branch = hrms_branch or default_branch
-		hrms_app_path = os.path.join(path, "apps", "hrms")
-		if not (skip_hrms_clone and os.path.lexists(hrms_app_path)):
-			get_app(
+				print_designer_branch,
+				"https://github.com/azizios011/Print-Designer_Compatible_windows.git",
+				skip_print_designer_clone,
+			),
+			"hrms": (
 				hrms_path,
-				branch=hrms_branch,
-				bench_path=path,
-				skip_assets=True,
-				verbose=verbose,
-				resolve_deps=False,
-			)
-
-		payments_path = payments_path or "https://github.com/azizios011/payments-Compatible_windows.git"
-		payments_branch = payments_branch or default_branch
-		payments_app_path = os.path.join(path, "apps", "payments")
-		if not (skip_payments_clone and os.path.lexists(payments_app_path)):
-			get_app(
+				hrms_branch,
+				"https://github.com/azizios011/hrms_Compatible_windows.git",
+				skip_hrms_clone,
+			),
+			"payments": (
 				payments_path,
-				branch=payments_branch,
-				bench_path=path,
-				skip_assets=True,
-				verbose=verbose,
-				resolve_deps=False,
-			)
-
-		webshop_path = webshop_path or "https://github.com/azizios011/webshop-Compatible_windows.git"
-		webshop_branch = webshop_branch or default_branch
-		webshop_app_path = os.path.join(path, "apps", "webshop")
-		if not (skip_webshop_clone and os.path.lexists(webshop_app_path)):
-			get_app(
+				payments_branch,
+				"https://github.com/azizios011/payments-Compatible_windows.git",
+				skip_payments_clone,
+			),
+			"webshop": (
 				webshop_path,
-				branch=webshop_branch,
-				bench_path=path,
-				skip_assets=True,
-				verbose=verbose,
-				resolve_deps=False,
-			)
-
-		builder_path = builder_path or "https://github.com/azizios011/builder-Compatible_windows.git"
-		builder_branch = builder_branch or default_branch
-		builder_app_path = os.path.join(path, "apps", "builder")
-		if not (skip_builder_clone and os.path.lexists(builder_app_path)):
-			get_app(
+				webshop_branch,
+				"https://github.com/azizios011/webshop-Compatible_windows.git",
+				skip_webshop_clone,
+			),
+			"builder": (
 				builder_path,
-				branch=builder_branch,
-				bench_path=path,
-				skip_assets=True,
-				verbose=verbose,
-				resolve_deps=False,
-			)
-
-		crm_path = crm_path or "https://github.com/azizios011/crm-Compatible_windows.git"
-		crm_branch = crm_branch or default_branch
-		crm_app_path = os.path.join(path, "apps", "crm")
-		if not (skip_crm_clone and os.path.lexists(crm_app_path)):
-			get_app(
+				builder_branch,
+				"https://github.com/azizios011/builder-Compatible_windows.git",
+				skip_builder_clone,
+			),
+			"crm": (
 				crm_path,
-				branch=crm_branch,
-				bench_path=path,
-				skip_assets=True,
-				verbose=verbose,
-				resolve_deps=False,
-			)
-
-		drive_path = drive_path or "https://github.com/azizios011/drive-Compatible_windows.git"
-		drive_branch = drive_branch or default_branch
-		drive_app_path = os.path.join(path, "apps", "drive")
-		if not (skip_drive_clone and os.path.lexists(drive_app_path)):
-			get_app(
+				crm_branch,
+				"https://github.com/azizios011/crm-Compatible_windows.git",
+				skip_crm_clone,
+			),
+			"drive": (
 				drive_path,
-				branch=drive_branch,
-				bench_path=path,
-				skip_assets=True,
-				verbose=verbose,
-				resolve_deps=False,
-			)
+				drive_branch,
+				"https://github.com/azizios011/drive-Compatible_windows.git",
+				skip_drive_clone,
+			),
+		}
+
+		# If no app flag was passed at all, keep the old behaviour: install everything.
+		# The moment at least one app flag is passed (bare or with a URL), only the
+		# apps that were explicitly named get cloned.
+		any_app_flag_passed = any(spec[0] is not None for spec in app_specs.values())
+
+		for app_name, (app_path, app_branch, default_url, skip_clone) in app_specs.items():
+			requested = app_path is not None
+			if any_app_flag_passed and not requested:
+				continue
+
+			resolved_path = app_path or default_url
+			resolved_branch = app_branch or default_branch
+			app_dir = os.path.join(path, "apps", app_name)
+			if not (skip_clone and os.path.lexists(app_dir)):
+				get_app(
+					resolved_path,
+					branch=resolved_branch,
+					bench_path=path,
+					skip_assets=True,
+					verbose=verbose,
+					resolve_deps=False,
+				)
 
 	# getting app on bench init using --install-app
 	if install_app:

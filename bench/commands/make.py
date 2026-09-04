@@ -21,14 +21,62 @@ import click
 	"--apps_path", default=None, help="path to json files with apps to install after init"
 )
 @click.option("--frappe-path", default=None, help="path to frappe repo")
-@click.option("--erpnext-path", default=None, help="path to erpnext repo")
-@click.option("--print-designer-path", default=None, help="path to print_designer repo")
-@click.option("--hrms-path", default=None, help="path to hrms repo")
-@click.option("--payments-path", default=None, help="path to payments repo")
-@click.option("--webshop-path", default=None, help="path to webshop repo")
-@click.option("--builder-path", default=None, help="path to builder repo")
-@click.option("--crm-path", default=None, help="path to crm repo")
-@click.option("--drive-path", default=None, help="path to drive repo")
+@click.option(
+	"--erpnext",
+	"erpnext_path",
+	is_flag=False,
+	flag_value="",
+	help="Use erpnext. Bare flag clones the default fork; pass a URL/path to override it.",
+)
+@click.option(
+	"--print-designer",
+	"print_designer_path",
+	is_flag=False,
+	flag_value="",
+	help="Use print_designer. Bare flag clones the default fork; pass a URL/path to override it.",
+)
+@click.option(
+	"--hrms",
+	"hrms_path",
+	is_flag=False,
+	flag_value="",
+	help="Use hrms. Bare flag clones the default fork; pass a URL/path to override it.",
+)
+@click.option(
+	"--payments",
+	"payments_path",
+	is_flag=False,
+	flag_value="",
+	help="Use payments. Bare flag clones the default fork; pass a URL/path to override it.",
+)
+@click.option(
+	"--webshop",
+	"webshop_path",
+	is_flag=False,
+	flag_value="",
+	help="Use webshop. Bare flag clones the default fork; pass a URL/path to override it.",
+)
+@click.option(
+	"--builder",
+	"builder_path",
+	is_flag=False,
+	flag_value="",
+	help="Use builder. Bare flag clones the default fork; pass a URL/path to override it.",
+)
+@click.option(
+	"--crm",
+	"crm_path",
+	is_flag=False,
+	flag_value="",
+	help="Use crm. Bare flag clones the default fork; pass a URL/path to override it.",
+)
+@click.option(
+	"--drive",
+	"drive_path",
+	is_flag=False,
+	flag_value="",
+	help="Use drive. Bare flag clones the default fork; pass a URL/path to override it.",
+)
 @click.option("--erpnext-branch", default=None, help="Clone a particular branch of erpnext")
 @click.option("--print-designer-branch", default=None, help="Clone a particular branch of print_designer")
 @click.option("--hrms-branch", default=None, help="Clone a particular branch of hrms")
