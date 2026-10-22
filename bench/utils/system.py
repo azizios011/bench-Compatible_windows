@@ -35,6 +35,7 @@ def init(
 	builder_path=None,
 	crm_path=None,
 	drive_path=None,
+	pilot_path=None,
 	frappe_branch=None,
 	erpnext_branch=None,
 	print_designer_branch=None,
@@ -44,6 +45,7 @@ def init(
 	builder_branch=None,
 	crm_branch=None,
 	drive_branch=None,
+	pilot_branch=None,
 	verbose=False,
 	clone_from=None,
 	skip_redis_config_generation=False,
@@ -61,6 +63,7 @@ def init(
 	skip_builder_clone=False,
 	skip_crm_clone=False,
 	skip_drive_clone=False,
+	skip_pilot_clone=False,
 ):
 	"""Initialize a new bench directory
 
@@ -178,15 +181,30 @@ def init(
 				"https://github.com/azizios011/drive-Compatible_windows.git",
 				skip_drive_clone,
 			),
+			"pilot": (
+				pilot_path,
+				pilot_branch,
+				"https://github.com/azizios011/pilot-Compatible_windows.git",
+				skip_pilot_clone,
+			),
 		}
+
+		# Apps that are never cloned by default: they only get cloned when their own
+		# --<app>-path flag is passed explicitly. pilot is the bench/site manager CLI,
+		# not an installable Frappe app, so it must not ride along on a plain `bench init`.
+		opt_in_only_apps = {"pilot"}
 
 		# If no app flag was passed at all, keep the old behaviour: install everything.
 		# The moment at least one app flag is passed (bare or with a URL), only the
 		# apps that were explicitly named get cloned.
-		any_app_flag_passed = any(spec[0] is not None for spec in app_specs.values())
+		any_app_flag_passed = any(
+			spec[0] is not None for name, spec in app_specs.items() if name not in opt_in_only_apps
+		)
 
 		for app_name, (app_path, app_branch, default_url, skip_clone) in app_specs.items():
 			requested = app_path is not None
+			if app_name in opt_in_only_apps and not requested:
+				continue
 			if any_app_flag_passed and not requested:
 				continue
 
