@@ -35,6 +35,7 @@ def init(
 	builder_path=None,
 	crm_path=None,
 	drive_path=None,
+	books_path=None,
 	pilot_path=None,
 	frappe_branch=None,
 	erpnext_branch=None,
@@ -45,6 +46,7 @@ def init(
 	builder_branch=None,
 	crm_branch=None,
 	drive_branch=None,
+	books_branch=None,
 	pilot_branch=None,
 	verbose=False,
 	clone_from=None,
@@ -63,6 +65,7 @@ def init(
 	skip_builder_clone=False,
 	skip_crm_clone=False,
 	skip_drive_clone=False,
+	skip_books_clone=False,
 	skip_pilot_clone=False,
 ):
 	"""Initialize a new bench directory
@@ -180,6 +183,12 @@ def init(
 				drive_branch,
 				"https://github.com/azizios011/drive-Compatible_windows.git",
 				skip_drive_clone,
+			),
+			"books": (
+				books_path,
+				books_branch,
+				"https://github.com/azizios011/books-Compatible_windows.git",
+				skip_books_clone,
 			),
 			"pilot": (
 				pilot_path,

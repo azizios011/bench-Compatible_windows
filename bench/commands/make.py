@@ -78,6 +78,13 @@ import click
 	help="Use drive. Bare flag clones the default fork; pass a URL/path to override it.",
 )
 @click.option(
+	"--books",
+	"books_path",
+	is_flag=False,
+	flag_value="",
+	help="Use books. Bare flag clones the default fork; pass a URL/path to override it.",
+)
+@click.option(
 	"--pilot",
 	"pilot_path",
 	is_flag=False,
@@ -92,6 +99,7 @@ import click
 @click.option("--builder-branch", default=None, help="Clone a particular branch of builder")
 @click.option("--crm-branch", default=None, help="Clone a particular branch of crm")
 @click.option("--drive-branch", default=None, help="Clone a particular branch of drive")
+@click.option("--books-branch", default=None, help="Clone a particular branch of books")
 @click.option("--pilot-branch", default=None, help="Clone a particular branch of pilot")
 @click.option("--skip-frappe-clone", is_flag=True, default=False, help="Skip frappe clone if app exists")
 @click.option("--skip-erpnext-clone", is_flag=True, default=False, help="Skip erpnext clone if app exists")
@@ -102,6 +110,7 @@ import click
 @click.option("--skip-builder-clone", is_flag=True, default=False, help="Skip builder clone if app exists")
 @click.option("--skip-crm-clone", is_flag=True, default=False, help="Skip crm clone if app exists")
 @click.option("--skip-drive-clone", is_flag=True, default=False, help="Skip drive clone if app exists")
+@click.option("--skip-books-clone", is_flag=True, default=False, help="Skip books clone if app exists")
 @click.option("--skip-pilot-clone", is_flag=True, default=False, help="Skip pilot clone if app exists")
 @click.option("--clone-from", default=None, help="copy repos from path")
 @click.option(
@@ -139,6 +148,7 @@ def init(
 	builder_path,
 	crm_path,
 	drive_path,
+	books_path,
 	pilot_path,
 	frappe_branch,
 	erpnext_branch,
@@ -149,6 +159,7 @@ def init(
 	builder_branch,
 	crm_branch,
 	drive_branch,
+	books_branch,
 	pilot_branch,
 	skip_frappe_clone,
 	skip_erpnext_clone,
@@ -159,6 +170,7 @@ def init(
 	skip_builder_clone,
 	skip_crm_clone,
 	skip_drive_clone,
+	skip_books_clone,
 	skip_pilot_clone,
 	no_procfile,
 	no_backups,
@@ -196,6 +208,7 @@ def init(
 			builder_path=builder_path,
 			crm_path=crm_path,
 			drive_path=drive_path,
+			books_path=books_path,
 			pilot_path=pilot_path,
 			frappe_branch=frappe_branch,
 			erpnext_branch=erpnext_branch,
@@ -206,6 +219,7 @@ def init(
 			builder_branch=builder_branch,
 			crm_branch=crm_branch,
 			drive_branch=drive_branch,
+			books_branch=books_branch,
 			pilot_branch=pilot_branch,
 			skip_frappe_clone=skip_frappe_clone,
 			skip_erpnext_clone=skip_erpnext_clone,
@@ -216,6 +230,7 @@ def init(
 			skip_builder_clone=skip_builder_clone,
 			skip_crm_clone=skip_crm_clone,
 			skip_drive_clone=skip_drive_clone,
+			skip_books_clone=skip_books_clone,
 			skip_pilot_clone=skip_pilot_clone,
 			install_app=install_app,
 			clone_from=clone_from,
